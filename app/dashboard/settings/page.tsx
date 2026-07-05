@@ -186,6 +186,13 @@ export default function SettingsPage() {
   const [notifDailyReport, setNotifDailyReport] = useState(false)
   const [notifWeeklyReport, setNotifWeeklyReport] = useState(true)
 
+  // Security
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPwd, setShowPwd] = useState(false)
+  const [pwdStrength, setPwdStrength] = useState<'' | 'weak' | 'fair' | 'strong'>('')
+
   const [activeTab, setActiveTab] = useState<Tab>('ai')
   const [saveState, setSaveState] = useState<Record<Tab, SaveState>>({
     ai: 'idle', whatsapp: 'idle', security: 'idle', preferences: 'idle',
