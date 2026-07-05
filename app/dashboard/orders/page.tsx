@@ -50,6 +50,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState<string | null>(null)
   const [filter, setFilter] = useState<FilterKey>('all')
+  const [refreshing, setRefreshing] = useState(false)
   const unsubscribeRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
@@ -103,6 +104,42 @@ export default function OrdersPage() {
       toast.error('Failed to update order.')
     } finally {
       setUpdating(null)
+    }
+  }
+
+  async function reload() {
+    setRefreshing(true)
+    try {
+      // Force a refresh by triggering a new snapshot listener
+      if (unsubscribeRef.current) unsubscribeRef.current()
+      
+      const ordersRef = collection(db, 'orders')
+      const q = query(
+        ordersRef,
+        where('businessId', '==', user!.uid),
+        orderBy('createdAt', 'desc')
+      )
+
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          const updated: Order[] = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          } as Order))
+          setOrders(updated)
+          setRefreshing(false)
+        },
+        (err) => {
+          console.error('[v0] Orders refresh error:', err)
+          setRefreshing(false)
+        }
+      )
+
+      unsubscribeRef.current = unsubscribe
+    } catch (err) {
+      console.error('[v0] Error refreshing orders:', err)
+      setRefreshing(false)
     }
   }
 
