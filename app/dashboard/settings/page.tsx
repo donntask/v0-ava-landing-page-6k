@@ -175,7 +175,9 @@ export default function SettingsPage() {
   const { user, business, refreshBusiness } = useAuth()
 
   // AI Agent
+  const [universalAIResponse, setUniversalAIResponse] = useState(true)
   const [aiPersonality, setAiPersonality] = useState(DEFAULT_PERSONALITY)
+  const [customPrompt, setCustomPrompt] = useState('')
   const [aiModel, setAiModel] = useState('google/gemini-2.0-flash-exp')
   const [whatsappPhone, setWhatsappPhone] = useState('')
   const [currency, setCurrency] = useState('NGN')
@@ -201,7 +203,9 @@ export default function SettingsPage() {
   // Hydrate from Firestore business doc
   useEffect(() => {
     if (!business) return
+    setUniversalAIResponse(business.universalAIResponse ?? true)
     setAiPersonality(business.aiPersonality ?? DEFAULT_PERSONALITY)
+    setCustomPrompt(business.customPrompt ?? '')
     setAiModel(business.openrouterModel ?? 'google/gemini-2.0-flash-exp')
     setWhatsappPhone(business.whatsappPhone ?? '')
     setCurrency(business.currency ?? 'NGN')
@@ -302,10 +306,25 @@ export default function SettingsPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              save('ai', { aiPersonality: aiPersonality.trim(), openrouterModel: aiModel })
+              save('ai', {
+                universalAIResponse,
+                aiPersonality: aiPersonality.trim(),
+                customPrompt: customPrompt.trim(),
+                openrouterModel: aiModel,
+              })
             }}
             className="space-y-5"
           >
+            <SectionLabel>Master Control</SectionLabel>
+            <ToggleRow
+              label="Enable AI Responses"
+              description="Kill switch — when off, AVA will not reply to any incoming messages regardless of other settings."
+              value={universalAIResponse}
+              onChange={setUniversalAIResponse}
+            />
+
+            <Divider />
+
             <SectionLabel>Personality & Tone</SectionLabel>
             <FieldBlock
               label="AI Character"
@@ -319,6 +338,24 @@ export default function SettingsPage() {
                 className="w-full bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:border-[var(--aro-green)]/60 rounded-xl px-3 py-3 text-sm resize-y outline-none transition-colors leading-relaxed"
               />
             </FieldBlock>
+
+            <Divider />
+
+            <SectionLabel>Extra Instructions</SectionLabel>
+            <FieldBlock
+              label="Custom Prompt"
+              hint="Additional instructions appended to every AI response. Use this for rules like pricing policies, prohibited topics, or business-specific context that applies globally."
+            >
+              <textarea
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                rows={5}
+                placeholder="e.g. Always offer free delivery on orders above ₦50,000. Never discuss competitor pricing..."
+                className="w-full bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:border-[var(--aro-green)]/60 rounded-xl px-3 py-3 text-sm resize-y outline-none transition-colors leading-relaxed"
+              />
+            </FieldBlock>
+
+            <Divider />
 
             <SectionLabel>AI Model</SectionLabel>
             <FieldBlock

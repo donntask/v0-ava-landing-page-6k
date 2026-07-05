@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   ChevronRight,
   UserCircle,
+  Wallet,
 } from 'lucide-react'
 
 // Desktop sidebar keeps Settings
@@ -27,6 +28,7 @@ const desktopNavItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard, exact: true },
   { href: '/dashboard/products', label: 'Products', icon: Package },
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/dashboard/payouts', label: 'Payouts', icon: Wallet },
   { href: '/dashboard/whatsapp', label: 'WhatsApp', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
@@ -45,6 +47,7 @@ const navItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard, exact: true },
   { href: '/dashboard/products', label: 'Products', icon: Package },
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/dashboard/payouts', label: 'Payouts', icon: Wallet },
   { href: '/dashboard/whatsapp', label: 'WhatsApp', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   { href: '/dashboard/profile', label: 'Profile', icon: UserCircle },

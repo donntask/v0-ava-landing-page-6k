@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const {
       uid, name, avatarUrl, aiPersonality, openrouterModel, whatsappPhone,
+      customPrompt, notificationNumber,
       currency, language, timezone,
       notifNewOrder, notifNewMessage, notifDailyReport, notifWeeklyReport,
     } = body
@@ -51,6 +52,8 @@ export async function POST(request: NextRequest) {
     if (aiPersonality !== undefined) updateData.aiPersonality = aiPersonality.trim()
     if (openrouterModel !== undefined) updateData.openrouterModel = openrouterModel.trim()
     if (whatsappPhone !== undefined) updateData.whatsappPhone = whatsappPhone.trim()
+    if (customPrompt !== undefined) updateData.customPrompt = customPrompt.trim()
+    if (notificationNumber !== undefined) updateData.notificationNumber = notificationNumber.trim()
     // Preferences
     if (currency !== undefined) updateData.currency = currency
     if (language !== undefined) updateData.language = language
