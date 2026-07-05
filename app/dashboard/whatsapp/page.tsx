@@ -37,7 +37,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Toggle } from '@/components/ui/toggle'
 
-const GATEWAY = process.env.NEXT_PUBLIC_GATEWAY_URL || 'https://aromsg.up.railway.app'
+function resolveGateway(raw?: string): string {
+  const url = (raw || 'https://aromsg.up.railway.app').trim().replace(/\/$/, '')
+  if (/^https?:\/\//i.test(url)) return url
+  return `https://${url}`
+}
+const GATEWAY = resolveGateway(process.env.NEXT_PUBLIC_GATEWAY_URL)
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
