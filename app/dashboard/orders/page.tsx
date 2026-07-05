@@ -15,6 +15,13 @@ import {
   XCircle,
   RefreshCw,
   TrendingUp,
+  X,
+  Building2,
+  MapPin,
+  CreditCard,
+  Hash,
+  Image as ImageIcon,
+  ChevronRight,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { toast } from 'sonner'
@@ -51,6 +58,7 @@ export default function OrdersPage() {
   const [updating, setUpdating] = useState<string | null>(null)
   const [filter, setFilter] = useState<FilterKey>('all')
   const [refreshing, setRefreshing] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const unsubscribeRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
@@ -254,7 +262,8 @@ export default function OrdersPage() {
               return (
                 <div
                   key={order.id}
-                  className="bg-card border border-border rounded-2xl overflow-hidden hover:border-[var(--aro-green)]/20 transition-all duration-200"
+                  onClick={() => setSelectedOrder(order)}
+                  className="bg-card border border-border rounded-2xl overflow-hidden hover:border-[var(--aro-green)]/20 transition-all duration-200 cursor-pointer"
                 >
                   {/* Top row */}
                   <div className="flex items-start justify-between gap-3 p-4 pb-3">
@@ -282,16 +291,21 @@ export default function OrdersPage() {
                   </div>
 
                   {/* Divider + meta */}
-                  <div className="px-4 pb-3 flex items-center gap-2">
-                    <Clock className="w-3 h-3 text-muted-foreground/60 shrink-0" />
-                    <p className="text-muted-foreground text-[11px]">
-                      {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true })}
-                    </p>
+                  <div className="px-4 pb-3 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-3 h-3 text-muted-foreground/60 shrink-0" />
+                      <p className="text-muted-foreground text-[11px]">
+                        {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground/60">
+                      Details <ChevronRight className="w-3 h-3" />
+                    </div>
                   </div>
 
                   {/* Action bar — pending only */}
                   {isPending && (
-                    <div className="flex border-t border-border">
+                    <div className="flex border-t border-border" onClick={(e) => e.stopPropagation()}>
                       <button
                         disabled={isUpdating}
                         onClick={() => handleStatusChange(order.id, 'confirmed')}
@@ -317,6 +331,191 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
+
+      {/* ── Order Detail Sheet ── */}
+      {selectedOrder && (() => {
+        const o = selectedOrder
+        const cfg = STATUS_CONFIG[o.status]
+        const StatusIcon = cfg.icon
+        return (
+          <div className="fixed inset-0 z-50 flex items-end lg:items-stretch lg:justify-end">
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedOrder(null)} />
+
+            {/* Sheet */}
+            <div className={cn(
+              'relative bg-card w-full overflow-y-auto flex flex-col',
+              'rounded-t-2xl max-h-[90vh]',
+              'lg:rounded-none lg:max-h-none lg:h-full lg:w-[420px] lg:border-l lg:border-border',
+            )}>
+              {/* Handle (mobile) */}
+              <div className="flex justify-center pt-3 pb-1 lg:hidden">
+                <div className="w-10 h-1 rounded-full bg-border" />
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0">
+                    <Package className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-foreground font-semibold text-sm truncate">{o.productName}</p>
+                    <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border mt-0.5', cfg.pill)}>
+                      <span className={cn('w-1.5 h-1.5 rounded-full', cfg.dot)} />
+                      {cfg.label}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors shrink-0"
+                  aria-label="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="flex flex-col gap-5 p-5">
+
+                {/* Amount + time */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-0.5">Amount</p>
+                    <p className="text-2xl font-bold text-[var(--aro-green)]">{fmt(o.amount)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-0.5">Placed</p>
+                    <p className="text-sm text-foreground">{formatDistanceToNow(new Date(o.createdAt), { addSuffix: true })}</p>
+                  </div>
+                </div>
+
+                {/* Customer details */}
+                <div className="bg-secondary rounded-2xl p-4 space-y-3">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Customer</p>
+                  {(o.phoneNumber ?? o.userId) && (
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-card flex items-center justify-center shrink-0">
+                        <Phone className="w-3.5 h-3.5 text-muted-foreground" />
+                      </div>
+                      <span className="text-foreground text-sm font-mono">{o.phoneNumber ?? o.userId}</span>
+                    </div>
+                  )}
+                  {o.deliveryAddress && (
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-card flex items-center justify-center shrink-0 mt-0.5">
+                        <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                      </div>
+                      <span className="text-foreground text-sm leading-relaxed">{o.deliveryAddress}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Payment / bank details */}
+                {(o.reference || o.generatedAccount) && (
+                  <div className="bg-secondary rounded-2xl p-4 space-y-3">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Payment Details</p>
+                    {o.reference && (
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-card flex items-center justify-center shrink-0">
+                          <Hash className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-muted-foreground">Reference</p>
+                          <p className="text-foreground text-sm font-mono">{o.reference}</p>
+                        </div>
+                      </div>
+                    )}
+                    {o.generatedBank && (
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-card flex items-center justify-center shrink-0">
+                          <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-muted-foreground">Bank</p>
+                          <p className="text-foreground text-sm">{o.generatedBank}</p>
+                        </div>
+                      </div>
+                    )}
+                    {o.generatedAccount && (
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-card flex items-center justify-center shrink-0">
+                          <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-muted-foreground">Account</p>
+                          <p className="text-foreground text-sm font-mono">{o.generatedAccount}</p>
+                          {o.generatedAccountName && (
+                            <p className="text-muted-foreground text-xs mt-0.5">{o.generatedAccountName}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {o.paidAt && (
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-card flex items-center justify-center shrink-0">
+                          <CheckCircle className="w-3.5 h-3.5 text-[var(--aro-green)]" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-muted-foreground">Paid at</p>
+                          <p className="text-foreground text-sm">{new Date(o.paidAt).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Invoice image */}
+                {o.invoiceImageData && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Invoice</p>
+                    <div className="rounded-2xl overflow-hidden border border-border bg-secondary">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={o.invoiceImageData}
+                        alt="Invoice"
+                        className="w-full object-contain max-h-64"
+                      />
+                    </div>
+                  </div>
+                )}
+                {!o.invoiceImageData && o.invoiceImage && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Invoice</p>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary border border-border">
+                      <ImageIcon className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span className="text-xs text-muted-foreground truncate">{o.invoiceImage}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Quick status actions */}
+                {o.status === 'pending' && (
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      disabled={updating === o.id}
+                      onClick={() => { handleStatusChange(o.id, 'confirmed'); setSelectedOrder(null) }}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold bg-[var(--aro-green)]/10 text-[var(--aro-green)] border border-[var(--aro-green)]/30 hover:bg-[var(--aro-green)]/15 transition-colors disabled:opacity-50"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Confirm
+                    </button>
+                    <button
+                      disabled={updating === o.id}
+                      onClick={() => { handleStatusChange(o.id, 'cancelled'); setSelectedOrder(null) }}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold bg-destructive/10 text-destructive border border-destructive/30 hover:bg-destructive/15 transition-colors disabled:opacity-50"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

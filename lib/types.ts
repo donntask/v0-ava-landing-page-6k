@@ -9,6 +9,9 @@ export interface Business {
   openrouterModel?: string
   avatarUrl?: string
   aiPersonality: string
+  customPrompt?: string
+  notificationNumber?: string
+  notificationVerifiedAt?: number
   // Preferences
   currency?: string
   language?: string
@@ -41,6 +44,15 @@ export interface Order {
   productName: string
   amount: number
   status: 'pending' | 'confirmed' | 'cancelled'
+  reference?: string
+  phoneNumber?: string
+  generatedAccount?: string
+  generatedBank?: string
+  generatedAccountName?: string
+  deliveryAddress?: string
+  invoiceImage?: string
+  invoiceImageData?: string   // base64 PNG
+  paidAt?: number
   createdAt: number
 }
 

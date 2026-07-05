@@ -21,14 +21,6 @@ export function getDeploymentUrl(): string {
   return 'http://localhost:3000'
 }
 
-export function getInternalWebhookUrl(): string {
-  return `${getDeploymentUrl()}/api/internal/receive-message`
-}
-
-export function getTestgroundWebhookUrl(): string {
-  return `${getDeploymentUrl()}/api/admin/testground/webhook`
-}
-
 export async function fetchDeploymentUrl(): Promise<string> {
   try {
     const response = await fetch('/api/deployment/url')

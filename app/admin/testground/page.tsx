@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { getTestgroundProducts, createTestgroundProduct, deleteTestgroundProduct, saveTestgroundConfig, getTestgroundConversationLogs, deleteTestgroundConversationLog } from '@/lib/firestore'
-import { getInternalWebhookUrl, getTestgroundWebhookUrl } from '@/lib/webhook-utils'
-import type { Product, TestgroundConversationLog } from '@/lib/types'
+import { getDeploymentUrl } from '@/lib/webhook-utils'
+import type { Product } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -84,8 +83,6 @@ export default function TestgroundPage() {
   const [copiedUrl, setCopiedUrl] = useState<'main' | 'testground' | null>(null)
   const [loadingAddProduct, setLoadingAddProduct] = useState(false)
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null)
-  const [conversationLogs, setConversationLogs] = useState<TestgroundConversationLog[]>([])
-  const [loadingLogs, setLoadingLogs] = useState(false)
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
     name: '',
     description: '',
@@ -94,81 +91,21 @@ export default function TestgroundPage() {
     negotiationEnabled: false,
   })
 
-  // Load testground products from Firestore on mount
+  // Load fallback products on mount
   useEffect(() => {
-    if (!user) return
-    async function load() {
-      try {
-        const prods = await getTestgroundProducts(user.uid)
-        if (prods && prods.length > 0) {
-          setProducts(prods)
-        } else {
-          console.log('[testground] No products in database, using fallback iPhone products')
-          setProducts(FALLBACK_PRODUCTS)
-        }
-      } catch (err) {
-        console.error('[testground] Failed to load products from database:', err)
-        console.log('[testground] Using fallback iPhone products instead')
-        setProducts(FALLBACK_PRODUCTS)
-        toast.error('Could not connect to database. Using sample products.')
-      } finally {
-        setLoadingProducts(false)
-      }
-    }
-    load()
-  }, [user])
-
-  // Auto-save testground config to Firestore whenever it changes
-  useEffect(() => {
-    if (!user || !products.length) return
-    async function saveConfig() {
-      try {
-        await saveTestgroundConfig(user.uid, {
-          products,
-          businessName: business.name,
-          aiPersonality: business.aiPersonality,
-          selectedModel,
-        })
-      } catch (err) {
-        console.error('[testground] Config save error:', err)
-      }
-    }
-    saveConfig()
-  }, [user, products, business.name, business.aiPersonality, selectedModel])
-
-  // Load conversation logs when showing them
-  async function loadConversationLogs() {
-    if (loadingLogs) return
-    setLoadingLogs(true)
-    try {
-      const logs = await getTestgroundConversationLogs()
-      setConversationLogs(logs)
-    } catch (err) {
-      console.error('[testground] Failed to load conversation logs:', err)
-      toast.error('Failed to load conversation logs')
-    } finally {
-      setLoadingLogs(false)
-    }
-  }
+    setProducts(FALLBACK_PRODUCTS)
+    setLoadingProducts(false)
+  }, [])
 
   const handleShowLogs = () => {
     setShowConversationLogs(true)
-    loadConversationLogs()
-  }
-
-  async function deleteConversationLog(logId: string) {
-    try {
-      await deleteTestgroundConversationLog(logId)
-      setConversationLogs(logs => logs.filter(l => l.id !== logId))
-      toast.success('Conversation log deleted')
-    } catch (err) {
-      console.error('[testground] Failed to delete log:', err)
-      toast.error('Failed to delete conversation log')
-    }
   }
 
   async function copyWebhookUrl(type: 'main' | 'testground') {
-    const url = type === 'main' ? getInternalWebhookUrl() : getTestgroundWebhookUrl()
+    const base = getDeploymentUrl()
+    const url = type === 'main'
+      ? `${base}/api/internal/receive-message`
+      : `${base}/api/admin/testground/webhook`
     try {
       await navigator.clipboard.writeText(url)
       setCopiedUrl(type)
@@ -205,49 +142,33 @@ export default function TestgroundPage() {
 
     setLoadingAddProduct(true)
     try {
-      console.log('[testground] Adding product:', { name: newProduct.name, price: newProduct.price })
-      
-      // Create a timeout promise that rejects after 10 seconds
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Request timed out - Firebase may not be configured')), 10000)
-      )
-      
-      const productPromise = createTestgroundProduct(user.uid, {
+      const created: Product = {
+        id: `local_${Date.now()}`,
         name: newProduct.name.trim(),
-        description: newProduct.description.trim(),
-        price: newProduct.price,
-        minPrice: newProduct.minPrice,
+        description: newProduct.description?.trim() ?? '',
+        price: newProduct.price ?? 0,
+        minPrice: newProduct.minPrice ?? 0,
         negotiationEnabled: newProduct.negotiationEnabled ?? false,
-      })
-      
-      const created = await Promise.race([productPromise, timeoutPromise])
-      console.log('[testground] Product created successfully:', created)
-      setProducts(prev => [...prev, created as typeof created])
+        businessId: 'testground',
+        createdAt: Date.now(),
+      }
+      setProducts(prev => [...prev, created])
       setNewProduct({ name: '', description: '', price: 0, minPrice: 0, negotiationEnabled: false })
       setShowProductForm(false)
       toast.success('Test product added successfully!')
     } catch (err) {
       console.error('[testground] Failed to add product:', err)
-      const errorMsg = err instanceof Error ? err.message : 'Unknown error'
-      toast.error(`Failed to add product: ${errorMsg}`)
+      toast.error('Failed to add product')
     } finally {
       setLoadingAddProduct(false)
     }
   }
 
   async function deleteProduct(id: string) {
-    if (!user) return
     setDeletingProductId(id)
-    try {
-      await deleteTestgroundProduct(user.uid, id)
-      setProducts(products.filter((p) => p.id !== id))
-      toast.success('Product removed')
-    } catch (err) {
-      console.error('[testground] Failed to delete product:', err)
-      toast.error('Failed to delete product')
-    } finally {
-      setDeletingProductId(null)
-    }
+    setProducts(products.filter((p) => p.id !== id))
+    toast.success('Product removed')
+    setDeletingProductId(null)
   }
 
   if (loading) {
@@ -336,7 +257,7 @@ export default function TestgroundPage() {
                     <p className="text-[#8892a4] text-xs font-medium mb-2">Main Platform Webhook</p>
                     <div className="flex gap-2">
                       <code className="flex-1 bg-[#0d1120] border border-[#25D366]/20 p-2 rounded text-[#25D366] text-xs overflow-x-auto break-all">
-                        {getInternalWebhookUrl()}
+                        {getDeploymentUrl()}/api/internal/receive-message
                       </code>
                       <button
                         onClick={() => copyWebhookUrl('main')}
@@ -351,7 +272,7 @@ export default function TestgroundPage() {
                     <p className="text-[#8892a4] text-xs font-medium mb-2">Testground Webhook</p>
                     <div className="flex gap-2">
                       <code className="flex-1 bg-[#0d1120] border border-[#25D366]/20 p-2 rounded text-[#25D366] text-xs overflow-x-auto break-all">
-                        {getTestgroundWebhookUrl()}
+                        {getDeploymentUrl()}/api/admin/testground/webhook
                       </code>
                       <button
                         onClick={() => copyWebhookUrl('testground')}
@@ -507,79 +428,18 @@ export default function TestgroundPage() {
         {/* Conversation Logs Modal */}
         {showConversationLogs && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <Card className="bg-[#111827] border-[#25D366]/15 w-full max-w-3xl max-h-[90vh] overflow-auto flex flex-col">
-              <div className="sticky top-0 bg-[#111827] border-b border-[#25D366]/15 p-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">Conversation Logs</h3>
-                <button
-                  onClick={() => setShowConversationLogs(false)}
-                  className="text-[#8892a4] hover:text-white transition-colors text-lg"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-auto p-4">
-                {loadingLogs ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Spinner className="w-5 h-5 mr-2" />
-                    <span className="text-[#8892a4] text-sm">Loading conversation logs...</span>
-                  </div>
-                ) : conversationLogs.length === 0 ? (
-                  <div className="text-center py-8 text-[#8892a4] text-sm">
-                    No conversation logs yet. Send messages to the testground webhook to see them here.
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {conversationLogs.map((log) => (
-                      <Card key={log.id} className="bg-[#0d1120] border-[#25D366]/15 p-3 space-y-2">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs text-[#8892a4] mb-1">
-                              <strong>From:</strong> {log.phoneNumber}
-                            </p>
-                            <div className="bg-[#111827] rounded p-2 mb-2">
-                              <p className="text-xs text-white break-words">
-                                <strong className="text-[#25D366]">User:</strong> {log.userMessage}
-                              </p>
-                            </div>
-                            <div className="bg-[#0f1419] rounded p-2 mb-2">
-                              <p className="text-xs text-[#25D366] break-words">
-                                <strong>AI:</strong> {log.aiResponse}
-                              </p>
-                            </div>
-                            {log.orderIntent && (
-                              <div className="bg-[#111827] rounded p-2 mb-2 border-l-2 border-[#25D366]">
-                                <p className="text-xs text-[#25D366]">
-                                  <strong>Order Intent:</strong> {log.orderIntent.productName} @ ${log.orderIntent.amount}
-                                </p>
-                              </div>
-                            )}
-                            <p className="text-xs text-[#8892a4]">
-                              {new Date(log.createdAt).toLocaleString()}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => deleteConversationLog(log.id)}
-                            className="text-[#8892a4] hover:text-red-400 transition-colors p-1 flex-shrink-0 ml-2"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="sticky bottom-0 bg-[#111827] border-t border-[#25D366]/15 p-4">
-                <Button
-                  onClick={() => setShowConversationLogs(false)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Close
-                </Button>
-              </div>
+            <Card className="bg-[#111827] border-[#25D366]/15 w-full max-w-md p-6 flex flex-col gap-4">
+              <h3 className="text-lg font-semibold text-white">Conversation Logs</h3>
+              <p className="text-sm text-[#8892a4]">
+                Conversation logs are now managed by the external webhook. Check your webhook service directly.
+              </p>
+              <Button
+                onClick={() => setShowConversationLogs(false)}
+                variant="outline"
+                className="w-full"
+              >
+                Close
+              </Button>
             </Card>
           </div>
         )}
