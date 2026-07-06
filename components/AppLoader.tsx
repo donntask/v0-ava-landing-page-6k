@@ -22,8 +22,8 @@ export function AppLoader({ show }: AppLoaderProps) {
       const remaining = Math.max(0, MIN_DISPLAY_MS - elapsed)
       timerRef.current = setTimeout(() => {
         setVisible(false)
-        // Remove ava-loading class so page content becomes visible
-        document.body.classList.remove('ava-loading')
+        // Remove aromsg-loading class so page content becomes visible
+        document.body.classList.remove('aromsg-loading')
       }, remaining)
     }
     return () => {
@@ -35,7 +35,7 @@ export function AppLoader({ show }: AppLoaderProps) {
     <AnimatePresence>
       {visible && (
         <motion.div
-          id="ava-loader-root"
+          id="aromsg-loader-root"
           key="app-loader"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}

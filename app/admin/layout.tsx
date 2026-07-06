@@ -1,6 +1,6 @@
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 
-export const metadata = { title: 'AVA Admin' }
+export const metadata = { title: 'AroMsg Admin' }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (

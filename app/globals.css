@@ -174,7 +174,7 @@
     @apply bg-background text-foreground antialiased;
   }
 
-  body.ava-loading > *:not(#ava-loader-root) {
+  body.aromsg-loading > *:not(#aromsg-loader-root) {
     visibility: hidden !important;
   }
 }

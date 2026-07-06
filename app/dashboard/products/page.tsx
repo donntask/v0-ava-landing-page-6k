@@ -207,7 +207,7 @@ export default function ProductsPage() {
         <div>
           <h1 className="text-xl font-bold text-foreground">Products</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            {products.length} product{products.length !== 1 ? 's' : ''} — AVA sells these via WhatsApp
+            {products.length} product{products.length !== 1 ? 's' : ''} — AroMsg sells these via WhatsApp
           </p>
         </div>
         <Button
@@ -233,7 +233,7 @@ export default function ProductsPage() {
             <div className="text-center">
               <p className="text-foreground font-semibold">No products yet</p>
               <p className="text-muted-foreground text-sm mt-1 max-w-xs">
-                Add your first product so AVA knows what to sell on WhatsApp.
+                Add your first product so AroMsg knows what to sell on WhatsApp.
               </p>
             </div>
             <Button
@@ -442,7 +442,7 @@ export default function ProductsPage() {
               >
                 <div className="text-left">
                   <p className="text-sm font-semibold text-foreground">Allow Negotiation</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">AVA negotiates between floor and price</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">AroMsg negotiates between floor and price</p>
                 </div>
                 {form.negotiationEnabled
                   ? <ToggleRight className="w-8 h-8 text-[var(--aro-green)] shrink-0" />

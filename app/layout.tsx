@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  manifest: '/manifest.json',
   title: 'AroMsg — AI Sales Agent That Closes Deals While You Sleep',
   description:
     'AroMsg powers Arobi, an AI Sales Agent that automates your sales on WhatsApp with human-like conversations, auto-payments, and smart negotiation. Never lose a customer in your DMs again.',
@@ -79,11 +80,31 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
       data-scroll-behavior="smooth"
     >
-      <body className="font-sans antialiased bg-background text-foreground overflow-x-hidden ava-loading">
+      <head>
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="AroMsg" />
+        <meta name="mobile-web-app-capable" content="yes" />
+      </head>
+      <body className="font-sans antialiased bg-background text-foreground overflow-x-hidden aromsg-loading">
         <Providers>
           {children}
         </Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .then(function(reg) { console.log('[AroMsg] SW registered:', reg.scope); })
+                    .catch(function(err) { console.log('[AroMsg] SW registration failed:', err); });
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   )

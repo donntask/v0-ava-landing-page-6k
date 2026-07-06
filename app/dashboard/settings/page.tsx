@@ -380,7 +380,7 @@ export default function SettingsPage() {
             <SectionLabel>Master Control</SectionLabel>
             <ToggleRow
               label="Enable AI Responses"
-              description="Kill switch — when off, AVA will not reply to any incoming messages regardless of other settings."
+              description="Kill switch — when off, AroMsg will not reply to any incoming messages regardless of other settings."
               value={universalAIResponse}
               onChange={setUniversalAIResponse}
             />
@@ -519,7 +519,7 @@ export default function SettingsPage() {
                 <>
                   <FieldBlock
                     label="Phone Number"
-                    hint="This WhatsApp number will receive order and message notification alerts from AVA. Must be a valid WhatsApp number."
+                    hint="This WhatsApp number will receive order and message notification alerts from AroMsg. Must be a valid WhatsApp number."
                   >
                     <div className="flex gap-2">
                       <Input
@@ -585,7 +585,7 @@ export default function SettingsPage() {
               <div className="flex items-start gap-3 p-4 bg-secondary border border-border rounded-xl">
                 <Bell className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  AVA will send new order and message alerts to this number via WhatsApp. You must verify ownership before notifications are enabled.
+                  AroMsg will send new order and message alerts to this number via WhatsApp. You must verify ownership before notifications are enabled.
                 </p>
               </div>
             </div>
