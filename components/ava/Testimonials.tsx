@@ -28,7 +28,7 @@ export function Testimonials({ content = DEFAULT_CONTENT.testimonials }: Testimo
           transition={{ duration: 0.5 }}
         >
           <p className="text-[var(--ava-purple-light)] text-sm font-medium uppercase tracking-widest mb-4">{content.sectionLabel}</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-balance">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
             {content.headline}{' '}
             <span className="text-gradient">{content.headlineAccent}</span>
           </h2>
@@ -63,7 +63,7 @@ export function Testimonials({ content = DEFAULT_CONTENT.testimonials }: Testimo
                       {t.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div>
-                      <p className="text-white text-xs font-semibold">{t.name}</p>
+                      <p className="text-foreground text-xs font-semibold">{t.name}</p>
                       <p className="text-[var(--ava-text-muted)] text-xs">{t.role}</p>
                     </div>
                   </div>

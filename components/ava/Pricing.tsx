@@ -26,7 +26,7 @@ export function Pricing({ content = DEFAULT_CONTENT.pricing }: PricingProps) {
           transition={{ duration: 0.5 }}
         >
           <p className="text-[var(--ava-purple-light)] text-sm font-medium uppercase tracking-widest mb-4">{content.sectionLabel}</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-balance">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
             {content.headline}{' '}
             <span className="text-gradient">{content.headlineAccent}</span>{' '}
             pricing
@@ -37,7 +37,7 @@ export function Pricing({ content = DEFAULT_CONTENT.pricing }: PricingProps) {
 
           {/* Toggle */}
           <div className="inline-flex items-center gap-3 bg-[var(--ava-surface)] border border-[var(--ava-border)] rounded-xl px-4 py-2">
-            <span className={`text-sm font-medium transition-colors ${!annual ? 'text-white' : 'text-[var(--ava-text-muted)]'}`}>Monthly</span>
+            <span className={`text-sm font-medium transition-colors ${!annual ? 'text-foreground' : 'text-[var(--ava-text-muted)]'}`}>Monthly</span>
             <button
               onClick={() => setAnnual((v) => !v)}
               className={`relative w-10 h-5.5 rounded-full transition-colors ${annual ? 'bg-[var(--ava-purple)]' : 'bg-[#1a2235]'}`}
@@ -50,7 +50,7 @@ export function Pricing({ content = DEFAULT_CONTENT.pricing }: PricingProps) {
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             </button>
-            <span className={`text-sm font-medium transition-colors ${annual ? 'text-white' : 'text-[var(--ava-text-muted)]'}`}>
+            <span className={`text-sm font-medium transition-colors ${annual ? 'text-foreground' : 'text-[var(--ava-text-muted)]'}`}>
               Annual
               <span className="ml-1.5 text-xs text-[var(--ava-teal)] font-bold">-20%</span>
             </span>
@@ -93,7 +93,7 @@ export function Pricing({ content = DEFAULT_CONTENT.pricing }: PricingProps) {
             )}
 
             <div className="mb-5">
-              <h3 className="text-white font-bold text-lg mb-1">{plan.name}</h3>
+              <h3 className="text-foreground font-bold text-lg mb-1">{plan.name}</h3>
               <p className="text-[var(--ava-text-muted)] text-sm">{plan.desc}</p>
             </div>
 
@@ -107,7 +107,7 @@ export function Pricing({ content = DEFAULT_CONTENT.pricing }: PricingProps) {
                   transition={{ duration: 0.2 }}
                   className="flex items-baseline gap-1"
                 >
-                  <span className="text-4xl font-extrabold text-white">
+                  <span className="text-4xl font-extrabold text-foreground">
                     ${annual ? plan.annualPrice : plan.monthlyPrice}
                   </span>
                   <span className="text-[var(--ava-text-muted)] text-sm">/mo</span>

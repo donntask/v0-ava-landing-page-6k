@@ -22,7 +22,7 @@ export function FAQ({ content = DEFAULT_CONTENT.faq }: FAQProps) {
           transition={{ duration: 0.5 }}
         >
           <p className="text-[var(--ava-purple-light)] text-sm font-medium uppercase tracking-widest mb-4">{content.sectionLabel}</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white text-balance">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground text-balance">
             {content.headline}{' '}
             <span className="text-gradient">{content.headlineAccent}</span>
           </h2>
@@ -43,7 +43,7 @@ export function FAQ({ content = DEFAULT_CONTENT.faq }: FAQProps) {
               onClick={() => setOpen(open === i ? null : i)}
               className="w-full flex items-center justify-between px-5 py-4 text-left"
             >
-              <span className="text-white font-medium text-sm pr-4">{faq.q}</span>
+              <span className="text-foreground font-medium text-sm pr-4">{faq.q}</span>
               <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--ava-purple)]/15 flex items-center justify-center">
                 {open === i
                   ? <Minus className="w-3.5 h-3.5 text-[var(--ava-purple-light)]" />
