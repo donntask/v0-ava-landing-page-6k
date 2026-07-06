@@ -1229,7 +1229,7 @@ export default function WhatsAppPage() {
                   messages.map((msg) => (
                     <div
                       key={msg.id}
-                      className={cn('flex', msg.role === 'assistant' ? 'justify-start' : 'justify-end')}
+                      className={cn('flex', msg.role === 'assistant' ? 'justify-end' : 'justify-start')}
                     >
                       {msg.role === 'system' ? (
                         <div className="w-full text-center">
@@ -1241,11 +1241,11 @@ export default function WhatsAppPage() {
                         <div className={cn(
                           'max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed',
                           msg.role === 'assistant'
-                            ? 'bg-card text-foreground border border-border rounded-bl-sm'
-                            : 'bg-[var(--aro-green)] text-[var(--aro-bg)] rounded-br-sm',
+                            ? 'bg-[var(--aro-green)] text-[var(--aro-bg)] rounded-br-sm'
+                            : 'bg-card text-foreground border border-border rounded-bl-sm',
                         )}>
                           {msg.role === 'assistant' && (
-                            <div className="flex items-center gap-1 mb-1.5 opacity-60">
+                            <div className="flex items-center gap-1 mb-1.5 opacity-70">
                               <Bot className="w-3 h-3" />
                               <span className="text-[10px] font-medium uppercase tracking-wide">AI</span>
                             </div>

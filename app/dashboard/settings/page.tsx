@@ -18,6 +18,9 @@ import {
   Eye,
   EyeOff,
   Check,
+  Bell,
+  BadgeCheck,
+  Send,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -188,6 +191,14 @@ export default function SettingsPage() {
   const [notifDailyReport, setNotifDailyReport] = useState(false)
   const [notifWeeklyReport, setNotifWeeklyReport] = useState(true)
 
+  // Notification number verification
+  const [notificationNumber, setNotificationNumber] = useState('')
+  const [verifiedNotificationNumber, setVerifiedNotificationNumber] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
+  const [sendingOtp, setSendingOtp] = useState(false)
+  const [verifyingOtp, setVerifyingOtp] = useState(false)
+
   // Security
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -215,6 +226,10 @@ export default function SettingsPage() {
     setNotifNewMessage(business.notifNewMessage ?? true)
     setNotifDailyReport(business.notifDailyReport ?? false)
     setNotifWeeklyReport(business.notifWeeklyReport ?? true)
+    if (business.notificationNumber) {
+      setVerifiedNotificationNumber(business.notificationNumber)
+      setNotificationNumber(business.notificationNumber)
+    }
   }, [business])
 
   // Password strength indicator
@@ -227,6 +242,53 @@ export default function SettingsPage() {
     const score    = [hasUpper, hasNum, hasSpec, long].filter(Boolean).length
     setPwdStrength(score >= 3 ? 'strong' : score >= 2 ? 'fair' : 'weak')
   }, [newPassword])
+
+  async function handleSendOtp() {
+    if (!user) { toast.error('Not authenticated.'); return }
+    const normalised = notificationNumber.replace(/\D/g, '')
+    if (normalised.length < 7) { toast.error('Enter a valid phone number.'); return }
+    setSendingOtp(true)
+    try {
+      const res = await fetch('/api/notifications/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: user.uid, phone: normalised }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to send OTP')
+      setOtpSent(true)
+      setOtpCode('')
+      toast.success(data.message)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to send OTP.')
+    } finally {
+      setSendingOtp(false)
+    }
+  }
+
+  async function handleVerifyOtp() {
+    if (!user) { toast.error('Not authenticated.'); return }
+    if (!otpCode.trim()) { toast.error('Enter the verification code.'); return }
+    setVerifyingOtp(true)
+    try {
+      const res = await fetch('/api/notifications/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: user.uid, otp: otpCode.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Verification failed')
+      setVerifiedNotificationNumber(data.phone)
+      setOtpSent(false)
+      setOtpCode('')
+      await refreshBusiness()
+      toast.success('Notification number verified and saved.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Verification failed.')
+    } finally {
+      setVerifyingOtp(false)
+    }
+  }
 
   async function save(tab: Tab, data: Record<string, unknown>) {
     if (!user) { toast.error('Not authenticated.'); return }
@@ -429,6 +491,103 @@ export default function SettingsPage() {
 
             <div className="flex justify-end">
               <SaveButton state={saveState.whatsapp} />
+            </div>
+
+            {/* ── Notification Number ─────────────────────────────── */}
+            <div className="border-t border-border pt-6 space-y-4">
+              <SectionLabel>Notification Number</SectionLabel>
+
+              {/* Verified badge */}
+              {verifiedNotificationNumber && (
+                <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[var(--aro-green)]/8 border border-[var(--aro-green)]/20">
+                  <BadgeCheck className="w-4 h-4 text-[var(--aro-green)] shrink-0" />
+                  <p className="text-sm text-foreground flex-1">
+                    <span className="font-mono font-semibold">+{verifiedNotificationNumber}</span>
+                    <span className="text-muted-foreground ml-1.5 text-xs">verified</span>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { setVerifiedNotificationNumber(''); setNotificationNumber(''); setOtpSent(false) }}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Change
+                  </button>
+                </div>
+              )}
+
+              {!verifiedNotificationNumber && (
+                <>
+                  <FieldBlock
+                    label="Phone Number"
+                    hint="This WhatsApp number will receive order and message notification alerts from AVA. Must be a valid WhatsApp number."
+                  >
+                    <div className="flex gap-2">
+                      <Input
+                        value={notificationNumber}
+                        onChange={(e) => { setNotificationNumber(e.target.value); setOtpSent(false) }}
+                        placeholder="+2348012345678"
+                        disabled={otpSent || sendingOtp}
+                        className="flex-1 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus:border-[var(--aro-green)]/60 h-11 rounded-xl font-mono"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={sendingOtp || otpSent || !notificationNumber.replace(/\D/g, '')}
+                        className="h-11 px-4 bg-[var(--aro-green)] hover:bg-[var(--aro-green-dark)] text-[var(--aro-bg)] rounded-xl shrink-0 gap-2"
+                      >
+                        {sendingOtp
+                          ? <span className="flex items-center gap-1.5"><Send className="w-3.5 h-3.5 animate-pulse" />Sending...</span>
+                          : <span className="flex items-center gap-1.5"><Send className="w-3.5 h-3.5" />Send Code</span>
+                        }
+                      </Button>
+                    </div>
+                  </FieldBlock>
+
+                  {otpSent && (
+                    <FieldBlock
+                      label="Verification Code"
+                      hint="Enter the 6-digit code sent to your WhatsApp number."
+                    >
+                      <div className="flex gap-2">
+                        <Input
+                          value={otpCode}
+                          onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                          placeholder="123456"
+                          maxLength={6}
+                          inputMode="numeric"
+                          className="flex-1 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus:border-[var(--aro-green)]/60 h-11 rounded-xl font-mono tracking-[0.3em] text-center"
+                        />
+                        <Button
+                          type="button"
+                          onClick={handleVerifyOtp}
+                          disabled={verifyingOtp || otpCode.length < 6}
+                          className="h-11 px-4 bg-[var(--aro-green)] hover:bg-[var(--aro-green-dark)] text-[var(--aro-bg)] rounded-xl shrink-0 gap-2"
+                        >
+                          {verifyingOtp
+                            ? <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 animate-pulse" />Verifying...</span>
+                            : <span className="flex items-center gap-1.5"><BadgeCheck className="w-3.5 h-3.5" />Verify</span>
+                          }
+                        </Button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={sendingOtp}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors mt-1"
+                      >
+                        Resend code
+                      </button>
+                    </FieldBlock>
+                  )}
+                </>
+              )}
+
+              <div className="flex items-start gap-3 p-4 bg-secondary border border-border rounded-xl">
+                <Bell className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  AVA will send new order and message alerts to this number via WhatsApp. You must verify ownership before notifications are enabled.
+                </p>
+              </div>
             </div>
           </form>
         )}
