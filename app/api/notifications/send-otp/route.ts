@@ -8,6 +8,11 @@ function resolveGateway(raw?: string): string {
   return `https://${url}`
 }
 
+function getGatewayUrl(): string {
+  // Prefer server-side env var; fall back to public one
+  return resolveGateway(process.env.WHATSAPP_GATEWAY_URL || process.env.NEXT_PUBLIC_GATEWAY_URL)
+}
+
 /**
  * POST /api/notifications/send-otp
  * Generates a 6-digit OTP, stores it in Firestore with a 10-minute TTL,
@@ -49,7 +54,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Send via WhatsApp gateway
-    const GATEWAY = resolveGateway(process.env.NEXT_PUBLIC_GATEWAY_URL)
+    const GATEWAY = getGatewayUrl()
     const jid = `${normalised}@s.whatsapp.net`
     const message = `Your AVA verification code is: *${otp}*\n\nThis code expires in 10 minutes. Do not share it with anyone.`
 
@@ -57,7 +62,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        sessionId: uid,
+        userId: uid,
         to: jid,
         text: message,
       }),
