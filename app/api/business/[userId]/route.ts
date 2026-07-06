@@ -18,7 +18,7 @@ export async function GET(
       .doc(userId)
       .get()
 
-    if (!businessDoc.exists()) {
+    if (!businessDoc.exists) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 })
     }
 
