@@ -7,39 +7,64 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
+// Module-level cache — persists across hook re-mounts within the same page session
+let cachedPrompt: BeforeInstallPromptEvent | null = null
+
 export function usePWAInstall() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [isInstallable, setIsInstallable] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(cachedPrompt)
+  const [isInstallable, setIsInstallable] = useState(!!cachedPrompt)
   const [isInstalled, setIsInstalled] = useState(false)
 
   useEffect(() => {
-    // Check if already installed as standalone PWA
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    // Already installed as standalone PWA
+    if (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      ('standalone' in window.navigator && (window.navigator as { standalone?: boolean }).standalone)
+    ) {
       setIsInstalled(true)
       return
     }
 
-    const handler = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e as BeforeInstallPromptEvent)
+    // Hydrate from module cache if event already fired
+    if (cachedPrompt) {
+      setDeferredPrompt(cachedPrompt)
       setIsInstallable(true)
     }
 
+    const handler = (e: Event) => {
+      e.preventDefault()
+      cachedPrompt = e as BeforeInstallPromptEvent
+      setDeferredPrompt(cachedPrompt)
+      setIsInstallable(true)
+    }
+
+    const installedHandler = () => {
+      setIsInstalled(true)
+      setIsInstallable(false)
+      cachedPrompt = null
+    }
+
     window.addEventListener('beforeinstallprompt', handler)
-    window.addEventListener('appinstalled', () => setIsInstalled(true))
+    window.addEventListener('appinstalled', installedHandler)
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handler)
+      window.removeEventListener('appinstalled', installedHandler)
     }
   }, [])
 
   async function triggerInstall() {
     if (!deferredPrompt) return
-    await deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
-    if (outcome === 'accepted') {
-      setIsInstalled(true)
-      setIsInstallable(false)
+    try {
+      await deferredPrompt.prompt()
+      const { outcome } = await deferredPrompt.userChoice
+      if (outcome === 'accepted') {
+        setIsInstalled(true)
+        setIsInstallable(false)
+        cachedPrompt = null
+      }
+    } catch {
+      // prompt() can throw if called at wrong time
     }
     setDeferredPrompt(null)
   }

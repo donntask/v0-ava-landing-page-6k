@@ -70,12 +70,12 @@ export function Hero({ content = DEFAULT_CONTENT.hero }: HeroProps) {
                 {content.ctaSecondary}
               </Button>
             </Link>
-            {/* PWA install — only shown on Android when browser fires beforeinstallprompt */}
-            {isInstallable && !isInstalled && (
+            {/* PWA install button — shown when Android Chrome fires beforeinstallprompt */}
+            {!isInstalled && isInstallable && (
               <Button
                 size="lg"
                 onClick={triggerInstall}
-                className="rounded-xl h-12 px-8 text-base font-semibold gap-2 bg-[var(--aro-teal)] hover:bg-[var(--aro-teal-dark)] text-white transition-all"
+                className="rounded-xl h-12 px-8 text-base font-semibold gap-2 bg-[var(--aro-green)] hover:opacity-90 text-[var(--aro-bg)] transition-all"
               >
                 <Download className="w-5 h-5" />
                 Download App
