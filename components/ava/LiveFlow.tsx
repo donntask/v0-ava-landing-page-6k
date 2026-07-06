@@ -26,7 +26,7 @@ const STEP_META = [
           </div>
           <div className="flex items-center gap-2 bg-[#1a2235] rounded-xl px-3 py-2">
             <div className="w-2 h-2 rounded-full bg-[#00D1B2] animate-pulse" />
-            <span className="text-[#8892a4] text-xs">AVA is listening...</span>
+            <span className="text-[#8892a4] text-xs">AroMsg is listening...</span>
           </div>
         </div>
       ),
@@ -165,7 +165,7 @@ export function LiveFlow({ content = DEFAULT_CONTENT.liveflow }: LiveFlowProps) 
           <div className="relative w-64">
             <div className="bg-[#0d1424] border border-[var(--ava-border)] rounded-[2rem] overflow-hidden shadow-2xl" style={{ boxShadow: `0 0 60px ${step.accent}20` }}>
               <div className="bg-[var(--ava-surface)] px-4 py-3 border-b border-[var(--ava-border)] flex items-center gap-2">
-                <Image src="/logo.png" alt="AVA" width={20} height={16} className="object-contain" />
+                <Image src="/aromsg-logo.png" alt="AroMsg" width={20} height={20} className="object-contain" />
                 <span className="text-foreground text-sm font-semibold">{step.phone.header}</span>
                 <div className="ml-auto w-2 h-2 rounded-full" style={{ background: step.accent }} />
               </div>

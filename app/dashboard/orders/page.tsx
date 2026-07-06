@@ -170,7 +170,7 @@ export default function OrdersPage() {
       <div className="px-4 pt-6 pb-4 lg:px-8 lg:pt-8 flex items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-foreground">Orders</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">Manage orders placed through AVA</p>
+          <p className="text-muted-foreground text-sm mt-0.5">Manage orders placed through AroMsg</p>
         </div>
         <button
           onClick={() => reload()}
@@ -246,7 +246,7 @@ export default function OrdersPage() {
               <p className="text-foreground font-semibold text-sm">No orders</p>
               <p className="text-muted-foreground text-xs mt-1">
                 {filter === 'all'
-                  ? 'Orders will appear here once customers buy through AVA.'
+                  ? 'Orders will appear here once customers buy through AroMsg.'
                   : `No ${filter} orders found.`}
               </p>
             </div>

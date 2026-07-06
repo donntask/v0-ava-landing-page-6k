@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     // Send via WhatsApp gateway
     const GATEWAY = getGatewayUrl()
     const jid = `${normalised}@s.whatsapp.net`
-    const message = `Your AVA verification code is: *${otp}*\n\nThis code expires in 10 minutes. Do not share it with anyone.`
+    const message = `Your AroMsg verification code is: *${otp}*\n\nThis code expires in 10 minutes. Do not share it with anyone.`
 
     const gwRes = await fetch(`${GATEWAY}/send-message`, {
       method: 'POST',

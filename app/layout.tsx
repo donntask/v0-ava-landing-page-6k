@@ -79,7 +79,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
       data-scroll-behavior="smooth"
     >
-      <body className="font-sans antialiased bg-background text-foreground overflow-x-hidden ava-loading">
+      <body className="font-sans antialiased bg-background text-foreground overflow-x-hidden aromsg-loading">
         <Providers>
           {children}
         </Providers>
