@@ -64,7 +64,7 @@ export function Footer({ content = DEFAULT_CONTENT.footer }: FooterProps) {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-5 text-balance">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mb-5 text-balance">
               {content.ctaHeadline}{' '}
               <span className="text-gradient-pink">{content.ctaHeadlineAccent}</span>
             </h2>
@@ -84,7 +84,7 @@ export function Footer({ content = DEFAULT_CONTENT.footer }: FooterProps) {
             <div className="flex items-center justify-center gap-8 mt-10 pt-10 border-t border-[var(--ava-border)]">
               {content.stats.map((s) => (
                 <div key={s.label} className="text-center">
-                  <p className="text-2xl font-extrabold text-white">{s.value}</p>
+                  <p className="text-2xl font-extrabold text-foreground">{s.value}</p>
                   <p className="text-[var(--ava-text-muted)] text-xs mt-0.5">{s.label}</p>
                 </div>
               ))}
@@ -114,7 +114,7 @@ export function Footer({ content = DEFAULT_CONTENT.footer }: FooterProps) {
                   key={s.key}
                   href={content.socialLinks[s.key as keyof typeof content.socialLinks] || '#'}
                   aria-label={s.label}
-                  className="w-8 h-8 rounded-lg bg-[var(--ava-surface-2)] border border-[var(--ava-border)] flex items-center justify-center text-[var(--ava-text-muted)] hover:text-white hover:border-[var(--ava-purple)]/40 transition-all"
+                  className="w-8 h-8 rounded-lg bg-[var(--ava-surface-2)] border border-[var(--ava-border)] flex items-center justify-center text-[var(--ava-text-muted)] hover:text-foreground hover:border-[var(--ava-purple)]/40 transition-all"
                 >
                   {s.icon}
                 </Link>
@@ -133,11 +133,11 @@ export function Footer({ content = DEFAULT_CONTENT.footer }: FooterProps) {
           {/* Link cols */}
           {content.linkGroups.map((group) => (
             <div key={group.group}>
-              <p className="text-white font-semibold text-sm mb-4">{group.group}</p>
+              <p className="text-foreground font-semibold text-sm mb-4">{group.group}</p>
               <ul className="flex flex-col gap-2.5">
                 {group.links.map((l) => (
                   <li key={l.label}>
-                    <Link href={l.href} className="text-[var(--ava-text-muted)] hover:text-white text-sm transition-colors">
+                    <Link href={l.href} className="text-[var(--ava-text-muted)] hover:text-foreground text-sm transition-colors">
                       {l.label}
                     </Link>
                   </li>

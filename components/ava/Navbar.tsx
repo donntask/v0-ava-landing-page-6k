@@ -48,7 +48,7 @@ export function Navbar({ content = DEFAULT_CONTENT.navbar }: NavbarProps) {
               <Link
                 key={l.href}
                 href={l.href}
-                className="text-[var(--ava-text-muted)] hover:text-white text-sm font-medium transition-colors"
+                className="text-[var(--ava-text-muted)] hover:text-foreground text-sm font-medium transition-colors"
               >
                 {l.label}
               </Link>
@@ -58,7 +58,7 @@ export function Navbar({ content = DEFAULT_CONTENT.navbar }: NavbarProps) {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             <Link href="/auth/login">
-              <Button variant="ghost" size="sm" className="text-[var(--ava-text-muted)] hover:text-white">
+              <Button variant="ghost" size="sm" className="text-[var(--ava-text-muted)] hover:text-foreground">
                 {content.ctaSignIn}
               </Button>
             </Link>
@@ -74,7 +74,7 @@ export function Navbar({ content = DEFAULT_CONTENT.navbar }: NavbarProps) {
 
           {/* Mobile menu toggle */}
           <button
-            className="md:hidden text-[var(--ava-text-muted)] hover:text-white transition-colors"
+            className="md:hidden text-[var(--ava-text-muted)] hover:text-foreground transition-colors"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label="Toggle menu"
           >

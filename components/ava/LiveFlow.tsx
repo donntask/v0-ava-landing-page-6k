@@ -108,7 +108,7 @@ export function LiveFlow({ content = DEFAULT_CONTENT.liveflow }: LiveFlowProps) 
           transition={{ duration: 0.5 }}
         >
           <p className="text-[var(--ava-purple-light)] text-sm font-medium uppercase tracking-widest mb-4">{content.sectionLabel}</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-balance">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
             {content.headline}{' '}
             <span className="text-gradient">{content.headlineAccent}</span>
           </h2>
@@ -150,7 +150,7 @@ export function LiveFlow({ content = DEFAULT_CONTENT.liveflow }: LiveFlowProps) 
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-bold" style={{ color: s.accent }}>{s.n}</span>
-                      <h3 className="text-white font-semibold">{s.title}</h3>
+                      <h3 className="text-foreground font-semibold">{s.title}</h3>
                     </div>
                     <p className="text-[var(--ava-text-muted)] text-sm leading-relaxed">{s.desc}</p>
                   </div>
@@ -166,7 +166,7 @@ export function LiveFlow({ content = DEFAULT_CONTENT.liveflow }: LiveFlowProps) 
             <div className="bg-[#0d1424] border border-[var(--ava-border)] rounded-[2rem] overflow-hidden shadow-2xl" style={{ boxShadow: `0 0 60px ${step.accent}20` }}>
               <div className="bg-[var(--ava-surface)] px-4 py-3 border-b border-[var(--ava-border)] flex items-center gap-2">
                 <Image src="/logo.png" alt="AVA" width={20} height={16} className="object-contain" />
-                <span className="text-white text-sm font-semibold">{step.phone.header}</span>
+                <span className="text-foreground text-sm font-semibold">{step.phone.header}</span>
                 <div className="ml-auto w-2 h-2 rounded-full" style={{ background: step.accent }} />
               </div>
               <div className="min-h-48">

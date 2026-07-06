@@ -128,7 +128,7 @@ function BentoCard({ card, index }: { card: MergedCard; index: number }) {
         <Icon className="w-4.5 h-4.5" style={{ color: card.accent, width: 18, height: 18 }} />
       </div>
 
-      <h3 className="text-white font-semibold text-sm mb-1.5">{card.title}</h3>
+      <h3 className="text-foreground font-semibold text-sm mb-1.5">{card.title}</h3>
       <p className="text-[var(--ava-text-muted)] text-xs leading-relaxed">{card.desc}</p>
 
       <MiniVisual visual={card.visual} accent={card.accent} />
@@ -155,7 +155,7 @@ export function BentoGrid({ content = DEFAULT_CONTENT.bento }: BentoGridProps) {
           transition={{ duration: 0.5 }}
         >
           <p className="text-[var(--ava-purple-light)] text-sm font-medium uppercase tracking-widest mb-4">{content.sectionLabel}</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-balance">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
             {content.headline}{' '}
             <span className="text-gradient">{content.headlineAccent}</span>
           </h2>

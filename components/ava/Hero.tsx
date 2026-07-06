@@ -2,11 +2,12 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowRight, Star } from 'lucide-react'
+import { ArrowRight, Star, Download, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ChatDemo } from './ChatDemo'
 import type { HeroContent } from '@/lib/content'
 import { DEFAULT_CONTENT } from '@/lib/content'
+import { usePWAInstall } from '@/lib/use-pwa-install'
 
 interface HeroProps { content?: HeroContent }
 
@@ -22,6 +23,8 @@ const fadeUp = {
 const AVATARS = ['#25D366', '#00a884', '#128C7E', '#075E54', '#4fde82']
 
 export function Hero({ content = DEFAULT_CONTENT.hero }: HeroProps) {
+  const { isInstallable, isInstalled, triggerInstall } = usePWAInstall()
+
   return (
     <section className="relative pt-32 pb-24 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
@@ -36,7 +39,7 @@ export function Hero({ content = DEFAULT_CONTENT.hero }: HeroProps) {
           {/* Headline */}
           <motion.h1
             variants={fadeUp}
-            className="text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.08] tracking-tight mb-6 text-balance"
+            className="text-5xl lg:text-6xl xl:text-7xl font-extrabold text-foreground leading-[1.08] tracking-tight mb-6 text-balance"
           >
             {content.headline}{' '}
             <span className="text-gradient-pink">{content.headlineAccent}</span>
@@ -62,11 +65,28 @@ export function Hero({ content = DEFAULT_CONTENT.hero }: HeroProps) {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-xl h-12 px-8 text-base border-[var(--ava-border)] text-[var(--ava-text-muted)] hover:text-white hover:bg-[var(--ava-surface-2)] transition-all"
+                className="rounded-xl h-12 px-8 text-base border-[var(--ava-border)] text-[var(--ava-text-muted)] hover:text-foreground hover:bg-[var(--ava-surface-2)] transition-all"
               >
                 {content.ctaSecondary}
               </Button>
             </Link>
+            {/* PWA install — only shown on Android when browser fires beforeinstallprompt */}
+            {isInstallable && !isInstalled && (
+              <Button
+                size="lg"
+                onClick={triggerInstall}
+                className="rounded-xl h-12 px-8 text-base font-semibold gap-2 bg-[var(--aro-teal)] hover:bg-[var(--aro-teal-dark)] text-white transition-all"
+              >
+                <Download className="w-5 h-5" />
+                Download App
+              </Button>
+            )}
+            {isInstalled && (
+              <div className="flex items-center gap-2 text-sm text-[var(--ava-text-muted)]">
+                <CheckCircle className="w-4 h-4 text-[var(--aro-green)]" />
+                App installed
+              </div>
+            )}
           </motion.div>
 
           {/* Social proof */}
@@ -115,7 +135,7 @@ export function Hero({ content = DEFAULT_CONTENT.hero }: HeroProps) {
       >
         {content.stats.map((s) => (
           <div key={s.label} className="bg-[var(--ava-surface)] px-6 py-5 text-center">
-            <p className="text-3xl font-extrabold text-white">{s.value}</p>
+            <p className="text-3xl font-extrabold text-foreground">{s.value}</p>
             <p className="text-[var(--ava-text-muted)] text-sm mt-1">{s.label}</p>
           </div>
         ))}
